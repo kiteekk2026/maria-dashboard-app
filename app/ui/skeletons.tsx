@@ -216,3 +216,34 @@ export function InvoicesTableSkeleton() {
     </div>
   );
 }
+export function CustomersTableSkeleton() {
+  return (
+    <div className="mt-6 flow-root">
+      <div className="overflow-x-auto">
+        <div className="inline-block min-w-full align-middle">
+          <div className="overflow-hidden rounded-md bg-gray-50 p-2 md:pt-0">
+            <div className="hidden min-w-full md:table">
+              <div className="border-b border-gray-100 bg-gray-50 px-6 py-5">
+                <div className="h-5 w-full rounded bg-gray-100" />
+              </div>
+
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-4 border-b border-gray-100 bg-white px-6 py-4"
+                >
+                  <div className="h-7 w-7 rounded-full bg-gray-100" />
+                  <div className="h-5 flex-1 rounded bg-gray-100" />
+                  <div className="h-5 flex-1 rounded bg-gray-100" />
+                  <div className="h-5 w-20 rounded bg-gray-100" />
+                  <div className="h-5 w-24 rounded bg-gray-100" />
+                  <div className="h-5 w-24 rounded bg-gray-100" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

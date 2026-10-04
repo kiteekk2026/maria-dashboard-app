@@ -22,7 +22,24 @@ const FormSchema = z.object({
   }),
   date: z.string(),
 });
- 
+
+const CustomerSchema = z.object({
+  name: z.string().trim().min(1, {
+    message: 'Please enter a customer name.',
+  }),
+  email: z.string().email({
+    message: 'Please enter a valid email address.',
+  }),
+  image_url: z.enum([
+    '/customers/amy-burns.png',
+    '/customers/balazs-orban.png',
+    '/customers/delba-de-oliveira.png',
+    '/customers/evil-rabbit.png',
+    '/customers/lee-robinson.png',
+    '/customers/michael-novotny.png',
+  ]),
+});
+
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 
 export type State = {
@@ -33,7 +50,16 @@ export type State = {
   };
   message?: string | null;
 };
- 
+
+export type CustomerState = {
+  errors?: {
+    name?: string[];
+    email?: string[];
+    image_url?: string[];
+  };
+  message?: string | null;
+};
+
 export async function createInvoice(prevState: State, formData: FormData) {
   // Validate form fields using Zod
   const validatedFields = CreateInvoice.safeParse({
@@ -71,6 +97,41 @@ export async function createInvoice(prevState: State, formData: FormData) {
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
+
+export async function createCustomer(
+  prevState: CustomerState,
+  formData: FormData,
+) {
+  const validatedFields = CustomerSchema.safeParse({
+    name: formData.get('name'),
+    email: formData.get('email'),
+    image_url: formData.get('image_url'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing or invalid fields. Failed to Create Customer.',
+    };
+  }
+
+  const { name, email, image_url } = validatedFields.data;
+
+  try {
+    await sql`
+      INSERT INTO customers (name, email, image_url)
+      VALUES (${name}, ${email}, ${image_url})
+    `;
+  } catch (error) {
+    return {
+      message: 'Database Error: Failed to Create Customer.',
+    };
+  }
+
+  revalidatePath('/dashboard/customers');
+  redirect('/dashboard/customers');
+}
+
 // Use Zod to update the expected types
 const UpdateInvoice = FormSchema.omit({ id: true, date: true });
  
@@ -111,7 +172,7 @@ export async function updateInvoice(
   redirect('/dashboard/invoices');
 }
 export async function deleteInvoice(id: string) {
-  throw new Error('Failed to Delete Invoice');
+  //throw new Error('Failed to Delete Invoice');
 
     await sql`DELETE FROM invoices WHERE id = ${id}`;
     revalidatePath('/dashboard/invoices');

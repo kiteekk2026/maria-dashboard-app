@@ -1,22 +1,26 @@
 import Image from 'next/image';
-import { lusitana } from '@/app/ui/fonts';
-import Search from '@/app/ui/search';
-import {
-  CustomersTableType,
-  FormattedCustomersTable,
-} from '@/app/lib/definitions';
+import { fetchFilteredCustomers } from '@/app/lib/data';
+import Link from 'next/link';
 
 export default async function CustomersTable({
-  customers,
+  query,
+  currentPage,
 }: {
-  customers: FormattedCustomersTable[];
+  query: string;
+  currentPage: number;
 }) {
+  const customers = await fetchFilteredCustomers(query, currentPage);
+
+  if (customers.length === 0) {
+    return (
+      <div className="mt-6 rounded-md bg-gray-50 p-6 text-center">
+        <p className="text-gray-500">No customers found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
-      <h1 className={`${lusitana.className} mb-8 text-xl md:text-2xl`}>
-        Customers
-      </h1>
-      <Search placeholder="Search customers..." />
       <div className="mt-6 flow-root">
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
@@ -38,7 +42,12 @@ export default async function CustomersTable({
                               width={28}
                               height={28}
                             />
-                            <p>{customer.name}</p>
+                            <Link
+                              href={`/dashboard/customers/${customer.id}`}
+                              className="hover:underline"
+                            >
+                              {customer.name}
+                            </Link>
                           </div>
                         </div>
                         <p className="text-sm text-gray-500">
@@ -95,7 +104,12 @@ export default async function CustomersTable({
                             width={28}
                             height={28}
                           />
-                          <p>{customer.name}</p>
+                          <Link
+                            href={`/dashboard/customers/${customer.id}`}
+                            className="hover:underline"
+                          >
+                            {customer.name}
+                          </Link>
                         </div>
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
