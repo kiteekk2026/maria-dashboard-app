@@ -21,16 +21,59 @@ export const formatDateToLocal = (
   return formatter.format(date);
 };
 
-export const generateYAxis = (revenue: Revenue[]) => {
-  // Calculate what labels we need to display on the y-axis
-  // based on highest record and in 1000s
-  const yAxisLabels = [];
-  const highestRecord = Math.max(...revenue.map((month) => month.revenue));
-  const topLabel = Math.ceil(highestRecord / 1000) * 1000;
+// export const generateYAxis = (revenue: Revenue[]) => {
+//   // Calculate what labels we need to display on the y-axis
+//   // based on highest record and in 1000s
+//   const yAxisLabels = [];
+//   const highestRecord = Math.max(...revenue.map((month) => month.revenue));
+//   const topLabel = Math.ceil(highestRecord / 1000) * 1000;
 
-  for (let i = topLabel; i >= 0; i -= 1000) {
-    yAxisLabels.push(`$${i / 1000}K`);
+//   for (let i = topLabel; i >= 0; i -= 1000) {
+//     yAxisLabels.push(`$${i / 1000}K`);
+//   }
+
+//   return { yAxisLabels, topLabel };
+// };
+export const generateYAxis = (revenue: Revenue[]) => {
+  const highestRecord = Math.max(
+    0,
+    ...revenue.map((month) => month.revenue),
+  );
+
+  if (highestRecord === 0) {
+    return {
+      yAxisLabels: ['$1K', '$750', '$500', '$250', '$0'],
+      topLabel: 1000,
+    };
   }
+
+  const roughStep = highestRecord / 4;
+
+  const magnitude = Math.pow(
+    10,
+    Math.floor(Math.log10(roughStep)),
+  );
+
+  const normalizedStep = roughStep / magnitude;
+
+  const niceStep =
+    normalizedStep <= 1 ? 1 :
+    normalizedStep <= 2 ? 2 :
+    normalizedStep <= 2.5 ? 2.5 :
+    normalizedStep <= 5 ? 5 : 10;
+
+  const step = niceStep * magnitude;
+  const topLabel = Math.ceil(highestRecord / step) * step;
+
+  const formatLabel = (value: number) =>
+    value >= 1000
+      ? `$${Number((value / 1000).toFixed(2))}K`
+      : `$${Number(value.toFixed(2))}`;
+
+  const yAxisLabels = Array.from(
+    { length: Math.round(topLabel / step) + 1 },
+    (_, index) => formatLabel(topLabel - index * step),
+  );
 
   return { yAxisLabels, topLabel };
 };

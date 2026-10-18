@@ -14,7 +14,6 @@ export default async function RevenueChart() {
   const revenue = await fetchRevenue();
   
   const chartHeight = 350;
-  // NOTE: Uncomment this code in Chapter 7
 
   const { yAxisLabels, topLabel } = generateYAxis(revenue);
 
@@ -27,28 +26,47 @@ export default async function RevenueChart() {
       <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
         Recent Revenue
       </h2>
-      {/* NOTE: Uncomment this code in Chapter 7 */}
 
       {<div className="rounded-xl bg-gray-50 p-4">
-        <div className="sm:grid-cols-13 mt-0 grid grid-cols-12 items-end gap-2 rounded-md bg-white p-4 md:gap-4">
-          <div
-            className="mb-6 hidden flex-col justify-between text-sm text-gray-400 sm:flex"
-            style={{ height: `${chartHeight}px` }}
-          >
-            {yAxisLabels.map((label) => (
-              <p key={label}>{label}</p>
-            ))}
-          </div>
+        <div
+          className="mt-0 grid items-end gap-1 rounded-md bg-white p-3 sm:gap-2 md:gap-4 md:p-4"
+          style={{
+          gridTemplateColumns: 'minmax(28px, 1.5fr) repeat(12, minmax(0, 1fr))',
+          }}
+        >
+        <div
+          className="mb-10 flex flex-col justify-between whitespace-nowrap text-[10px] text-gray-400 sm:mb-10 sm:text-sm"
+          style={{ height: `${chartHeight}px` }}
+        >
+          {yAxisLabels.map((label) => (
+           <p key={label}>{label}</p>
+          ))}
+        </div>
 
-          {revenue.map((month) => (
-            <div key={month.month} className="flex flex-col items-center gap-2">
+          {revenue.map((month, index) => (
+            <div
+              key={month.month}
+              className="flex min-w-0 flex-col items-center"
+            >
               <div
-                className="w-full rounded-md bg-blue-300"
-                style={{
-                  height: `${(chartHeight / topLabel) * month.revenue}px`,
-                }}
-              ></div>
-              <p className="-rotate-90 text-sm text-gray-400 sm:rotate-0">
+                className="flex w-full items-end"
+                style={{ height: `${chartHeight}px` }}
+              >
+                <div
+                  className="w-full rounded-md bg-blue-300"
+                  style={{
+                    height: `${(chartHeight / topLabel) * month.revenue}px`,
+                  }}
+                />
+              </div>
+
+              <p
+                className={`mt-2 h-10 text-center text-xs leading-4 text-gray-400 sm:text-sm ${
+                  index === 0 || index === 3 || index === 6 || index === 11
+                    ? ''
+                    : 'invisible sm:visible'
+                }`}
+              >
                 {month.month}
               </p>
             </div>

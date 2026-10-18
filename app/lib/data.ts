@@ -12,17 +12,36 @@ import { formatCurrency } from './utils';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+// export async function fetchRevenue() {
+//   try {
+//     const data = await sql<Revenue[]>`SELECT * FROM revenue`;
+
+//     return data;
+//   } catch (error) {
+//     console.error('Database Error:', error);
+//     throw new Error('Failed to fetch revenue data.');
+//   }
+// }
 export async function fetchRevenue() {
   try {
-    // Artificially delay a response for demo purposes.
-    // Don't do this in production :)
+    const data = await sql<
+      { month: string; revenue: number }[]
+    >`
+      SELECT
+        TO_CHAR(months.month_start, 'Mon YY') AS month,
+        ROUND(COALESCE(SUM(i.amount), 0) / 100.0, 2)::float8 AS revenue
+      FROM GENERATE_SERIES(
+        DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '11 months',
+        DATE_TRUNC('month', CURRENT_DATE),
+        INTERVAL '1 month'
+      ) AS months(month_start)
+      LEFT JOIN invoices AS i
+        ON DATE_TRUNC('month', i.date) = months.month_start
+        AND i.status = 'paid'
+      GROUP BY months.month_start
+      ORDER BY months.month_start
+    `;
 
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const data = await sql<Revenue[]>`SELECT * FROM revenue`;
-
-    // console.log('Data fetch completed after 3 seconds.');
     return data;
   } catch (error) {
     console.error('Database Error:', error);
