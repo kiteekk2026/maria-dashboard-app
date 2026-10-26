@@ -103,3 +103,30 @@ Address review comments before merging.
 - Never commit secrets, passwords, API keys, or database credentials.
 - Keep environment variables in `.env` files that are excluded from Git.
 - Report security concerns to the project owner.
+
+## 8. Definition of Ready (DoR)
+
+A task is ready for development when:
+
+- The task has a clear description and explains its purpose or user value.
+- Acceptance criteria describe the expected result.
+- The scope of the task is clear.
+- Dependencies and prerequisites are identified.
+- The task has an estimate.
+- The task can be tested, and the testing approach is clear.
+
+If these conditions are not met, the task should remain in the Backlog until it is ready.
+
+## 9. Definition of Done (DoD)
+
+A task is considered done when:
+
+- The implementation meets the acceptance criteria.
+- The code follows the project conventions.
+- Relevant functionality has been tested.
+- `pnpm lint` and `pnpm build` pass when applicable.
+- Documentation has been updated when necessary.
+- The Pull Request has been reviewed and approved.
+- All requested review changes have been addressed.
+- Required automated checks pass.
+- The changes have been merged into `main`.
